@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitNutrition - คำนวณสารอาหารและวางแผนออกกำลังกาย</title>
+    <!-- Tailwind CSS สำหรับตกแต่งเว็บให้สวยงามทันสมัย -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Prompt', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col justify-between">
+
+    <!-- Header -->
+    <header class="bg-emerald-600 text-white py-6 shadow-md">
+        <div class="container mx-auto px-4 text-center">
+            <h1 class="text-3xl font-bold">💪 FitNutrition Planner</h1>
+            <p class="text-emerald-100 mt-1">คำนวณพลังงาน โภชนาการ และวางแผนกินเพื่อสุขภาพของคุณแบบเฉพาะบุคคล</p>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="container mx-auto px-4 py-8 max-w-4xl flex-grow">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            
+            <!-- ส่วนฟอร์มกรอกข้อมูล (Left Column) -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <h2 class="text-xl font-semibold mb-4 text-emerald-700">📋 กรอกข้อมูลส่วนตัวของคุณ</h2>
+                
+                <form id="fitnessForm" class="space-y-4">
+                    <!-- เพศ -->
+                    <div>
+                        <label class="block text-sm font-medium text-slate-600 mb-1">เพศ</label>
+                        <select id="gender" class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none">
+                            <option value="male">ชาย</option>
+                            <option value="female">หญิง</option>
+                        </select>
+                    </div>
+
+                    <!-- อายุ และ น้ำหนัก -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-600 mb-1">อายุ (ปี)</label>
+                            <input type="number" id="age" required class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="25">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-600 mb-1">น้ำหนัก (kg)</label>
+                            <input type="number" step="0.1" id="weight" required class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="65">
+                        </div>
+                    </div>
+
+                    <!-- ส่วนสูง -->
+                    <div>
+                        <label class="block text-sm font-medium text-slate-600 mb-1">ส่วนสูง (cm)</label>
+                        <input type="number" id="height" required class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="170">
+                    </div>
+
+                    <!-- ระดับกิจกรรม -->
+                    <div>
+                        <label class="block text-sm font-medium text-slate-600 mb-1">ระดับกิจกรรมทางกาย</label>
+                        <select id="activity" class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none">
+                            <option value="1.2">น้อยมาก (นั่งทำงานโต๊ะ ไม่ค่อยออกกำลังกาย)</option>
+                            <option value="1.375">เล็กน้อย (ออกกำลังกาย 1-3 วัน/สัปดาห์)</option>
+                            <option value="1.55" selected>ปานกลาง (ออกกำลังกาย 3-5 วัน/สัปดาห์)</option>
+                            <option value="1.725">หนัก (ออกกำลังกาย 6-7 วัน/สัปดาห์)</option>
+                            <option value="1.9">หนักมาก (นักกีฬา / ใช้แรงงานหนัก)</option>
+                        </select>
+                    </div>
+
+                    <!-- เป้าหมาย -->
+                    <div>
+                        <label class="block text-sm font-medium text-slate-600 mb-1">เป้าหมายของคุณ</label>
+                        <select id="goal" class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none">
+                            <option value="maintain">รักษาน้ำหนักคงที่</option>
+                            <option value="lose">ลดน้ำหนัก / ลดไขมัน</option>
+                            <option value="gain">เพิ่มกล้ามเนื้อ / เพิ่มน้ำหนัก</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="w-full bg-emerald-600 text-white py-3 rounded-lg font-semibold hover:bg-emerald-700 transition duration-200 shadow-md cursor-pointer">
+                        คำนวณผลลัพธ์ 🚀
+                    </button>
+                </form>
+            </div>
+
+            <!-- ส่วนแสดงผลลัพธ์ (Right Column) -->
+            <div class="space-y-6">
+                <!-- การ์ดแสดงผลลัพธ์ (ซ่อนไว้ก่อนจนกว่าจะกดคำนวณ) -->
+                <div id="resultCard" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hidden">
+                    <h2 class="text-xl font-semibold mb-4 text-emerald-700">📊 ผลลัพธ์การคำนวณของคุณ</h2>
+                    
+                    <div class="space-y-3 mb-6">
+                        <div class="flex justify-between p-3 bg-slate-50 rounded-lg">
+                            <span class="text-slate-600">BMR (พลังงานพื้นฐาน):</span>
+                            <span class="font-bold text-slate-800"><span id="bmrVal">0</span> kcal</span>
+                        </div>
+                        <div class="flex justify-between p-3 bg-emerald-50 rounded-lg border border-emerald-100">
+                            <span class="text-emerald-800 font-medium">TDEE (พลังงานที่ควรได้รับต่อวัน):</span>
+                            <span class="font-bold text-emerald-700"><span id="tdeeVal">0</span> kcal</span>
+                        </div>
+                    </div>
+
+                    <!-- สัดส่วน Macros -->
+                    <h3 class="font-semibold text-slate-700 mb-2">🥗 สัดส่วนสารอาหารหลัก (Macros)</h3>
+                    <div class="grid grid-cols-3 gap-2 text-center mb-6">
+                        <div class="bg-blue-50 p-3 rounded-lg border border-blue-100">
+                            <div class="text-xs text-blue-600 font-medium">โปรตีน</div>
+                            <div class="font-bold text-blue-700 text-lg" id="proteinVal">0g</div>
+                        </div>
+                        <div class="bg-amber-50 p-3 rounded-lg border border-amber-100">
+                            <div class="text-xs text-amber-600 font-medium">คาร์บ</div>
+                            <div class="font-bold text-amber-700 text-lg" id="carbVal">0g</div>
+                        </div>
+                        <div class="bg-rose-50 p-3 rounded-lg border border-rose-100">
+                            <div class="text-xs text-rose-600 font-medium">ไขมัน</div>
+                            <div class="font-bold text-rose-700 text-lg" id="fatVal">0g</div>
+                        </div>
+                    </div>
+
+                    <!-- คำแนะนำ -->
+                    <h3 class="font-semibold text-slate-700 mb-2">💡 คำแนะนำอาหารและตัวเสริม</h3>
+                    <div id="adviceText" class="text-sm text-slate-600 bg-slate-50 p-4 rounded-lg leading-relaxed border border-slate-200">
+                        <!-- ข้อความคำแนะนำ -->
+                    </div>
+                </div>
+
+                <!-- การ์ดเริ่มต้น (แสดงตอนยังไม่กดคำนวณ) -->
+                <div id="placeholderCard" class="bg-white p-12 rounded-2xl shadow-sm border border-slate-200 text-center text-slate-400">
+                    <p class="text-4xl mb-2">👈</p>
+                    <p>กรอกข้อมูลด้านซ้ายแล้วกดปุ่ม "คำนวณผลลัพธ์" เพื่อดูแผนโภชนาการของคุณ</p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t py-4 text-center text-sm text-slate-500">
+        <p>Fitness & Nutrition Planner Project • สร้างขึ้นเพื่อสุขภาพที่ดีของคุณ</p>
+    </footer>
+
+    <!-- JavaScript ระบบคำนวณหลังบ้าน -->
+    <script>
+        document.getElementById('fitnessForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // ดึงค่าจากฟอร์ม
+            const gender = document.getElementById('gender').value;
+            const age = parseFloat(document.getElementById('age').value);
+            const weight = parseFloat(document.getElementById('weight').value);
+            const height = parseFloat(document.getElementById('height').value);
+            const activity = parseFloat(document.getElementById('activity').value);
+            const goal = document.getElementById('goal').value;
+
+            // 1. คำนวณ BMR (สูตร Mifflin-St Jeor)
+            let bmr = (10 * weight) + (6.25 * height) - (5 * age);
+            if (gender === 'male') {
+                bmr += 5;
+            } else {
+                bmr -= 161;
+            }
+
+            // 2. คำนวณ TDEE
+            let tdee = bmr * activity;
+
+            // 3. ปรับตามเป้าหมายและจัดคำแนะนำ
+            let targetCalories = tdee;
+            let advice = "";
+            let proteinPerKg = 1.6;
+
+            if (goal === 'lose') {
+                targetCalories -= 400; 
+                proteinPerKg = 2.0;    
+                advice = "🔥 <strong>เป้าหมายลดน้ำหนัก/ไขมัน:</strong> ควบคุมแคลอรีให้อยู่ในกรอบที่กำหนด เน้นทานอาหารโปรตีนสูงเพื่อป้องกันกล้ามเนื้อสลาย เลี่ยงของทอดและน้ำตาล ออกกำลังกายแบบ Cardio ควบคู่กับ Weight Training";
+            } else if (goal === 'gain') {
+                targetCalories += 300; 
+                proteinPerKg = 2.2;    
+                advice = "💪 <strong>เป้าหมายเพิ่มกล้ามเนื้อ:</strong> ทานอาหารให้เกินพลังงานที่ใช้เล็กน้อย เน้นโปรตีนและคาร์โบไฮเดรตเชิงซ้อน เสริมด้วย <strong>Creatine</strong> และทานเวย์โปรตีนหลังเวทเทรนนิ่งเพื่อฟื้นฟูกล้ามเนื้อ";
+            } else {
+                proteinPerKg = 1.6;
+                advice = "⚖️ <strong>เป้าหมายรักษาน้ำหนัก:</strong> ทานอาหารให้เท่ากับพลังงานที่ใช้ (TDEE) เน้นทานอาหารให้ครบ 5 หมู่ และออกกำลังกายสม่ำเสมอเพื่อสุขภาพที่ดี";
+            }
+
+            // 4. คำนวณ Macros
+            const proteinGrams = Math.round(weight * proteinPerKg);
+            const proteinCalories = proteinGrams * 4;
+
+            const fatCalories = targetCalories * 0.25; // 25% ของแคลอรี
+            const fatGrams = Math.round(fatCalories / 9);
+
+            const carbCalories = targetCalories - (proteinCalories + fatCalories);
+            const carbGrams = Math.max(0, Math.round(carbCalories / 4));
+
+            // แสดงผลลงบนหน้าเว็บ
+            document.getElementById('bmrVal').innerText = Math.round(bmr);
+            document.getElementById('tdeeVal').innerText = Math.round(targetCalories);
+            document.getElementById('proteinVal').innerText = proteinGrams + 'g';
+            document.getElementById('carbVal').innerText = carbGrams + 'g';
+            document.getElementById('fatVal').innerText = fatGrams + 'g';
+            document.getElementById('adviceText').innerHTML = advice;
+
+            // สลับการแสดงผลหน้าจอ
+            document.getElementById('placeholderCard').classList.add('hidden');
+            document.getElementById('resultCard').classList.remove('hidden');
+        });
+    </script>
+</body>
+</html>
